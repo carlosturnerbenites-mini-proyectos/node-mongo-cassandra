@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="description">
+  <meta name="author" content="author">
+  <title>Title</title>
+  <link rel="icon" href="favicon.ico">
+  <!-- fonts -->
+  <link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto:300">
+  <!-- spectre.css -->
+  <!-- also suggests consistent color theme -->
+  <link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.1/spectre.min.css">
+  <style>
+    body {
+      /*
+      font-family: 'Open Sans', sans-serif;
+      */
+      background: #e7e9ed;
+      font-size: 16pt;
+      color: #454d5d;
+      padding-left: 1em;
+    }
+  </style>
+
+  <!-- preloading late-discovered js -->
+</head>
+
+<body>
+
+  <div id='app'>
+
+    <form action="" @submit.prevent="createStory">
+      <!-- form input control -->
+      <div class="form-group">
+        <label class="form-label" for="input-example-1">Titulo</label>
+        <input v-model="dataNewStory.title" required class="form-input" type="text" id="input-example-1" placeholder="Titulo">
+      </div>
+
+      <div class="form-group">
+        <label class="form-checkbox" v-for="tag in tags">
+          <input type="checkbox" :value="tag.name" v-model="dataNewStory.tags">
+          <i class="form-icon"></i> {{tag.name}}
+          <i @click="deleteTag(tag)" class="icon icon-cross"> X </i>
+        </label>
+        <div class="input-group" style="display: inline-flex;">
+          <!-- <span class="input-group-addon">Agregar</span> -->
+          <input v-model="dataNewTag.name" type="text" class="form-input" placeholder="">
+          <button @click="createTag" type="button" class="btn btn-primary input-group-btn">+</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-info">Nuevo Post</button>
+      <button @click="removeAllStories" type="button" class="btn btn-danger">Borrar Todo</button>
+    </form>
+
+
+    <div>
+      <div class="card" v-for="story in stories">
+        <div class="card-image">
+        </div>
+        <div class="card-header">
+          <div class="card-title h5">
+            <div class="has-icon-left">
+              <input v-model="story.title" type="text" class="form-input" placeholder="...">
+              <i class="form-icon icon icon-check"></i>
+            </div>
+          <div class="card-subtitle text-gray"></div>
+        </div>
+        <div class="card-body">
+          <div>
+            <div class="form-group">
+              <label class="form-checkbox" v-for="tag in tags">
+                <input type="checkbox" :value="tag.name" v-model="story.tags">
+                <i class="form-icon"></i> {{tag.name}}
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button @click="updateStory(story)" class="btn btn-primary">Actualizar</button>
+          <button @click="deleteStory(story)" class="btn btn-primary">Borrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- vue.js -->
+  <script src='vue.js'></script>
+  <script src='jquery-3.3.1.min.js'></script>
+  <script src='index.js'></script>
+</body>
+
+</html>
