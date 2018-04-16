@@ -7,110 +7,124 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="description">
   <meta name="author" content="author">
-  <title>Title</title>
+  <title>Historias</title>
   <link rel="icon" href="favicon.ico">
   <!-- fonts -->
   <link rel='stylesheet' href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto:300">
   <!-- spectre.css -->
   <!-- also suggests consistent color theme -->
   <link rel='stylesheet' href="https://cdnjs.cloudflare.com/ajax/libs/spectre.css/0.5.1/spectre.min.css">
-  <style>
-    body {
-      /*
-      font-family: 'Open Sans', sans-serif;
-      */
-      background: #e7e9ed;
-      font-size: 16pt;
-      color: #454d5d;
-      padding-left: 1em;
-    }
-  </style>
 
-  <!-- preloading late-discovered js -->
 </head>
 
 <body>
 
   <div id='app'>
-
-    <form action="" @submit.prevent="createStory">
-      <!-- form input control -->
-      <div class="form-group">
-        <label class="form-label" for="input-example-1">Titulo</label>
-        <input v-model="dataNewStory.title" required class="form-input" type="text" id="input-example-1" placeholder="Titulo">
-      </div>
-
-      <div class="form-group">
-        <select
-          class="form-select"
-          v-model="dataNewStory.author"
-          required
-        >
-          <option v-for="person in people" :value="person._id"> {{person.name}} </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label class="form-checkbox" v-for="tag in tags">
-          <input type="checkbox" :value="tag.name" v-model="dataNewStory.tags">
-          <i class="form-icon"></i> {{tag.name}}
-          <i @click="deleteTag(tag)" class="icon icon-cross"> X </i>
-        </label>
-        <div class="input-group" style="display: inline-flex;">
-          <!-- <span class="input-group-addon">Agregar</span> -->
-          <input v-model="dataNewTag.name" type="text" class="form-input" placeholder="">
-          <button @click="createTag" type="button" class="btn btn-primary input-group-btn">+</button>
+    <div class="content">
+      <div class="container">
+        <div class="text-right" style="margin: 5px 0px">
+          <button class="btn btn-primary" @click="toggleModal"> Agregar Historia</button>
+          <button @click="removeAllStories" type="button" class="btn btn-error">Borrar Todo</button>
         </div>
-      </div>
-
-      <button type="submit" class="btn btn-info">Nuevo Post</button>
-      <button @click="removeAllStories" type="button" class="btn btn-danger">Borrar Todo</button>
-    </form>
 
 
-    <div>
-      <div class="card" v-for="story in stories">
-        <div class="card-image">
-        </div>
-        <div class="card-header">
-          <div class="card-title h5">
-            <div class="has-icon-left">
-              <input v-model="story.title" type="text" class="form-input" placeholder="...">
-              <i class="form-icon icon icon-check"></i>
+        <div :class="{'active': modal}" class="modal" id="modal-id">
+          <a @click.prevent="toggleModal" href="#close" class="modal-overlay" aria-label="Close" ></a>
+          <div class="modal-container">
+            <div class="modal-header">
+              <a @click.prevent="toggleModal" href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+              <div class="modal-title h5">Nueva Historia</div>
             </div>
-          <div class="card-subtitle text-gray"></div>
-        </div>
-        <div class="card-body">
-          <div class="form-group">
-            <select
-              class="form-select"
-              v-model="story.author"
-              required
-            >
-              <option
-                v-for="person in people"
-                :value="person"
-              >
-                {{person.name}}
-              </option>
-            </select>
-          </div>
-          <div>
-            <div class="form-group">
-              <label class="form-checkbox" v-for="tag in tags">
-                <input type="checkbox" :value="tag.name" v-model="story.tags">
-                <i class="form-icon"></i> {{tag.name}}
-              </label>
+            <div class="modal-body">
+              <div class="content">
+                <div class="card">
+                  <div class="card-body">
+                    <form id="formNewStory" action="" @submit.prevent="createStory">
+                      <!-- form input control -->
+                      <div class="form-group">
+                        <label class="form-label" for="input-example-1">Titulo</label>
+                        <input v-model="dataNewStory.title" required class="form-input" type="text" id="input-example-1" placeholder="Titulo">
+                      </div>
+
+                      <div class="form-group">
+                        <select class="form-select" v-model="dataNewStory.author" required>
+                          <option v-for="person in people" :value="person._id"> {{person.name}} </option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label class="form-checkbox" v-for="tag in tags">
+                          <input type="checkbox" :value="tag.name" v-model="dataNewStory.tags">
+                          <i class="form-icon"></i> {{tag.name}}
+                          <i @click="deleteTag(tag)" class="icon icon-cross"> X </i>
+                        </label>
+                        <div class="input-group" style="display: inline-flex;">
+                          <!-- <span class="input-group-addon">Agregar</span> -->
+                          <input v-model="dataNewTag.name" type="text" class="form-input" placeholder="">
+                          <button @click="createTag" type="button" class="btn btn-primary input-group-btn">+</button>
+                        </div>
+                      </div>
+
+                    </form>
+
+                  </div>
+                  <div class="card-footer">
+                    <button form="formNewStory" type="submit" class="btn btn-info">Agregar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              ...
             </div>
           </div>
         </div>
-        <div class="card-footer">
-          <button @click="updateStory(story)" class="btn btn-primary">Actualizar</button>
-          <button @click="deleteStory(story)" class="btn btn-primary">Borrar</button>
+
+        <div class="columns">
+          <div class="column col-6 card" v-for="(story, index) in stories">
+            <div class="card-image">
+            </div>
+            <div class="card-header">
+              <div class="card-title h5">
+                <div class="has-icon-left">
+                  <input v-model="story.title" type="text" class="form-input" placeholder="...">
+                  <i class="form-icon icon icon-check"></i>
+                </div>
+              <div class="card-subtitle text-gray"></div>
+            </div>
+            <div class="card-body">
+              <div class="form-group">
+                <select
+                  class="form-select"
+                  v-model="story.author"
+                  required
+                >
+                  <option
+                    v-for="person in people"
+                    :value="person"
+                  >
+                    {{person.name}}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <div class="form-group">
+                  <label class="form-checkbox" v-for="tag in tags">
+                    <input type="checkbox" :value="tag.name" v-model="story.tags">
+                    <i class="form-icon"></i> {{tag.name}}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer" :class="{'text-left': index%2!=0, 'text-right': index%2==0}">
+              <button @click="updateStory(story)" class="btn btn-primary">Actualizar</button>
+              <button @click="deleteStory(story)" class="btn btn-link bg-warning">Borrar</button>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 
   <!-- vue.js -->

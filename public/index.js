@@ -5,6 +5,7 @@ const app = new Vue({
     people: [],
     stories: [],
     tags: [],
+    modal: false,
     dataNewStory: {
       title: '',
       tags: [],
@@ -23,6 +24,9 @@ const app = new Vue({
 
   },
   methods: {
+    toggleModal() {
+      this.modal = !this.modal;
+    },
     ajax(type, url, data) {
       return new Promise((resolve, reject) => {
         $.ajax({
@@ -60,6 +64,7 @@ const app = new Vue({
       const $vm = this;
       this.ajax('POST', '/api/stories', this.dataNewStory)
         .then((r) => { $vm.stories.push(r); })
+        .then(this.toggleModal)
         .catch(this.catchError);
     },
     createTag() {
