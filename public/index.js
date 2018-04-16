@@ -1,6 +1,8 @@
+/* global $, Vue */
 const app = new Vue({
   el: '#app',
   data: {
+    people: [],
     stories: [],
     tags: [],
     dataNewStory: {
@@ -35,8 +37,6 @@ const app = new Vue({
       });
     },
     catchError(err) {
-      console.log(err)
-      alert(err.responseJSON.message)
     },
     loadTags() {
       const $vm = this;
@@ -44,11 +44,17 @@ const app = new Vue({
         .then((r) => { $vm.tags = r; })
         .catch(this.catchError);
     },
-    loadstories() {
+    loadStories() {
       const $vm = this;
       this.ajax('GET', '/api/stories')
         .then((r) => { $vm.stories = r; })
         .catch(this.catchError);
+    },
+    loadPeople() {
+      const $vm = this;
+      this.ajax('GET', '/api/people')
+        .then((r) => { $vm.people = r; })
+        // .catch(this.catchError);
     },
     createStory() {
       const $vm = this;
@@ -71,7 +77,7 @@ const app = new Vue({
     updateStory(story) {
       const $vm = this;
       this.ajax('PUT', '/api/story', story)
-        .then((r) => { })
+        // .then((r) => {})
         .catch(this.catchError);
     },
     deleteStory(story) {
@@ -88,7 +94,8 @@ const app = new Vue({
     },
   },
   mounted() {
-    this.loadstories();
+    this.loadStories();
+    this.loadPeople();
     this.loadTags();
   },
 });

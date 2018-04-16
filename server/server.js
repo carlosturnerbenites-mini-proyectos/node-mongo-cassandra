@@ -66,12 +66,22 @@ const storySchema = Schema({
 const Story = mongoose.model('Story', storySchema);
 const Person = mongoose.model('Person', personSchema);
 
+app.get('/api/people', jsonParser, (req, res) => {
+  // if (!req.body) return res.sendStatus(400);
+  Person.find({}, (err, people) => {
+    if (err) return handleError(err);
+    return res.json(people); // create user in req.body
+  });
+});
+
 app.get('/api/stories', jsonParser, (req, res) => {
   // if (!req.body) return res.sendStatus(400);
-  Story.find({}, (err, stories) => {
-    if (err) return handleError(err);
-    return res.json(stories); // create user in req.body
-  });
+  Story.find({})
+    .populate('author')
+    .exec((err, stories) => {
+      if (err) return handleError(err);
+      return res.json(stories); // create user in req.body
+    });
 });
 
 app.post('/api/stories', jsonParser, (req, res) => {
@@ -82,8 +92,11 @@ app.post('/api/stories', jsonParser, (req, res) => {
 
   story.save((err) => {
     if (err) return res.json(err);
-    // thats it!
-    return res.json(story);
+    story.populate('author', (err, storyPopulate) => {
+      if (err) return res.json(err);
+      // thats it!
+      return res.json(storyPopulate);
+    });
   });
 });
 
@@ -101,10 +114,32 @@ app.delete('/api/story', jsonParser, (req, res) => {
 
   Story.remove({ _id: data._id }, (err, story) => {
     if (err) return handleError(err);
-    Story.find({}, (err, stories) => {
-      if (err) return handleError(err);
-      return res.json(stories); // create user in req.body
-    });
+    Story.find({})
+      .populate('author')
+      .exec((err, stories) => {
+        if (err) return handleError(err);
+        return res.json(stories); // create user in req.body
+      });
+  });
+});
+
+
+app.put('/api/story', jsonParser, (req, res) => {
+  if (!req.body) return res.sendStatus(404);
+  let data = req.body;
+
+  Story.update({
+    _id: data._id,
+  },
+  {
+    $set: {
+      title: data.title,
+      tags: data.tags,
+      author: data.author._id,
+    },
+  }, (err, story) => {
+    if (err) return handleError(err);
+    return res.json(story); // create user in req.body
   });
 });
 
@@ -125,21 +160,11 @@ app.delete('/api/tag', jsonParser, (req, res) => {
           res.json(result.rows)
         });
       });
-    }else{
-      res.status(404).json({ message: 'No se puede borrar el tag'});
+    } else {
+      res.status(404).json({ message: 'No se puede borrar el tag' });
     }
   });
 
-});
-
-app.put('/api/story', jsonParser, (req, res) => {
-  if (!req.body) return res.sendStatus(404);
-  let data = req.body;
-
-  Story.update({ _id: data._id }, { $set: { title: data.title, tags: data.tags } }, (err, story) => {
-    if (err) return handleError(err);
-    return res.json(story); // create user in req.body
-  });
 });
 
 app.get('/api/tags', jsonParser, (req, res) => {
